@@ -206,7 +206,7 @@ apis.endpoints = [
         id: 'list_products_by_vendor',
         requestType: 'GET',
         parameters: 'vendorId',
-        response: [apis.entities.product]
+        response: { products: [apis.entities.product]}
     },{
         name: 'List Versions by Product',
         description: 'Get a list of all of the versions associated with the parameterized product',
@@ -231,7 +231,7 @@ apis.endpoints = [
         id: 'list_vendors',
         requestType: 'GET',
         parameters: null,
-        response: [apis.entities.vendor]
+        response: { vendors: [apis.entities.vendor] }
     },{
         name: 'Get Vendor',
         description: 'Get a specific vendor, with relevant data',
@@ -267,17 +267,26 @@ apis.endpoints = [
         response: apis.entities.vendor
     },{
         name: 'Update Product',
-        description: 'Update one or more products with passed in data. If more than one productId is supplied, merge the products, assigning all versions originally assigned to any of the products to the single resulting product. If a newVendorId is supplied in the Request, the Product is changing ownership; merge the products (if necessary), and then reassign it to the new Vendor indicated',
+        description: 'Update one or more products with passed in data.',
         note: 'The Product object in the Request parameter will not have a productId or lastModifiedDate field',
-        request: '/update_product',
+        request: '/product/update_product',
         id: 'update_product',
         requestType: 'POST',
-        jsonParameter: [ "productIds": ['productId'], "product": apis.entities.product, 'newVendorId'],
-        response: apis.entities.success
+        jsonParameter: [{
+        	details: "Reassign one or more products to a different vendor",
+        	parameter: { "productIds": ['productId'], "newVendorId" : "newVendorId (required)"}
+        },{
+        	details: "Update the information about one single product",
+        	parameter: { "productIds": ['productId'], "product": apis.entities.product},
+        }, {
+        	details: 'Merge the products with the passed in productId(s), assigning all versions originally assigned to any of the products to the single resulting product. If newVendorId is not supplied, the vendorId for the merged product will be the same as the vendorId for the first product passed into the productId list.',
+        	parameter: { "productIds": ['productId'], "product": apis.entities.product, 'newVendorId' : "newVendorId (optional)"}
+        }
+        response: apis.entities.product
     },{
         name: 'Update Version',
         description: 'Update the version of a specific product',
-        request: '/update_version',
+        request: '/product/version/update_version',
         id: 'update_version',
         requestType: 'POST',
         jsonParameter: {"versionId" : 'versionId', "version": 'versionText'},
